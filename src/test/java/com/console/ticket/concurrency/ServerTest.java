@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class ServerTest {
     private Client client;
@@ -35,17 +34,17 @@ class ServerTest {
         emptyList = new CopyOnWriteArrayList<>();
 
 
-        client = new Client(inputDataList);
         server = new Server(emptyList);
+        client = new Client(server, inputDataList, threadsQuantity);
     }
 
     @DisplayName("assert that server received all the data from client")
     @Test
     void checkServerListSizeIsEqualTo100() {
-        client.start(server, threadsQuantity, listSize);
+        client.start();
 
         int expectedListSize = listSize;
-        int actualListSize = server.getCurrentSize().getListSize();
+        int actualListSize = server.getListSize();
 
         assertThat(actualListSize).isEqualTo(expectedListSize);
     }

@@ -1,33 +1,24 @@
 package com.console.ticket.concurrency;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
-import java.util.stream.IntStream;
+import java.util.Random;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 public class ConcurrencyRunner {
 
-    private static int threadsQuantity = 3;
-    private static int queueCapacity = 100;
+    private static final int threadsQuantity = 3;
+    private static final int listSize = 100;
 
-    public static void main(String[] args){
-        List<Integer> integerList = getIntegerQueue(queueCapacity);
-        List<Integer> empty = getIntegerQueue(0);
+    public static void main(String[] args) {
+        List<Integer> dataList = new Random().ints(listSize).boxed()
+                .collect(Collectors.toCollection(CopyOnWriteArrayList::new));
+        List<Integer> emptyList = new CopyOnWriteArrayList<>();
 
-        Client client = new Client(integerList);
-        Server server = new Server(empty);
+        Server server = new Server(emptyList);
+        Client client = new Client(server, dataList, threadsQuantity);
 
-        client.start(server, threadsQuantity, queueCapacity);
+        client.start();
         System.out.println(client.getAccumulator());
-    }
-
-    private static CopyOnWriteArrayList<Integer> getIntegerQueue(int size){
-        CopyOnWriteArrayList<Integer> integerQueue = new CopyOnWriteArrayList<>();
-
-
-        IntStream.range(0, size)
-                .forEach(index -> integerQueue.add(index, index + 5));
-
-        return integerQueue;
     }
 }

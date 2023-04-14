@@ -6,18 +6,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 class ClientTest {
+
     private Client client;
-    private Server server;
-    private List<Integer> inputDataList;
-    private List<Integer> emptyList;
     private static int listSize;
     private static int threadsQuantity;
 
@@ -29,20 +27,19 @@ class ClientTest {
 
     @BeforeEach
     void initialize() {
-        inputDataList = IntStream.range(0, listSize)
-                .boxed()
+        List<Integer> inputDataList = new Random().ints(listSize).boxed()
                 .collect(Collectors.toCollection(CopyOnWriteArrayList::new));
-        emptyList = new CopyOnWriteArrayList<>();
+        List<Integer> emptyList = new CopyOnWriteArrayList<>();
 
 
-        client = new Client(inputDataList);
-        server = new Server(emptyList);
+        Server server = new Server(emptyList);
+        client = new Client(server, inputDataList, threadsQuantity);
     }
 
     @DisplayName("assert that client send all the data to server")
     @Test
     void checkClientListSizeIsEmpty() {
-        client.start(server, threadsQuantity, listSize);
+        client.start();
 
         int expectedListSize = 0;
         int actualListSize = client.getSendDataSize();
